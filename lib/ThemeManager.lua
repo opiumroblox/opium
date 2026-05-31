@@ -72,7 +72,12 @@ local ThemeManager = {} do
 	end
 
 	function ThemeManager:SaveDefault(theme)
+		if not theme or theme == '' then
+			return false
+		end
+
 		writefile(self.Folder .. '/themes/default.txt', theme)
+		return true
 	end
 
 	function ThemeManager:CreateThemeManager(groupbox)
@@ -93,8 +98,12 @@ local ThemeManager = {} do
 		groupbox:AddDropdown('ThemeManager_ThemeList', { Text = 'Theme list', Values = ThemesArray, Default = 1 })
 
 		groupbox:AddButton('Set as default', function()
-			self:SaveDefault(Options.ThemeManager_ThemeList.Value)
-			self.Library:Notify(string.format('Set default theme to %q', Options.ThemeManager_ThemeList.Value))
+			local theme = Options.ThemeManager_ThemeList.Value
+			if not self:SaveDefault(theme) then
+				return self.Library:Notify('Select a theme first', 2)
+			end
+
+			self.Library:Notify(string.format('Set default theme to %q', theme))
 		end)
 
 		Options.ThemeManager_ThemeList:OnChanged(function()
@@ -121,9 +130,13 @@ local ThemeManager = {} do
 		end)
 
 		groupbox:AddButton('Set as default', function()
-			if Options.ThemeManager_CustomThemeList.Value ~= nil and Options.ThemeManager_CustomThemeList.Value ~= '' then
-				self:SaveDefault(Options.ThemeManager_CustomThemeList.Value)
-				self.Library:Notify(string.format('Set default theme to %q', Options.ThemeManager_CustomThemeList.Value))
+			local theme = Options.ThemeManager_CustomThemeList.Value
+			if theme ~= nil and theme ~= '' then
+				if not self:SaveDefault(theme) then
+					return self.Library:Notify('Select a custom theme first', 2)
+				end
+
+				self.Library:Notify(string.format('Set default theme to %q', theme))
 			end
 		end)
 
@@ -141,6 +154,10 @@ local ThemeManager = {} do
 	end
 
 	function ThemeManager:GetCustomTheme(file)
+		if not file or file == '' then
+			return nil
+		end
+
 		local path = self.Folder .. '/themes/' .. file
 		if not isfile(path) then
 			return nil
@@ -157,7 +174,7 @@ local ThemeManager = {} do
 	end
 
 	function ThemeManager:SaveCustomTheme(file)
-		if file:gsub(' ', '') == '' then
+		if not file or file:gsub(' ', '') == '' then
 			return self.Library:Notify('Invalid file name for theme (empty)', 3)
 		end
 

@@ -2484,7 +2484,7 @@ do
         end;
 
         function Dropdown:SetValues(NewValues)
-            if NewValues then
+            if type(NewValues) == 'table' then
                 Dropdown.Values = NewValues;
             end;
 
@@ -2512,9 +2512,11 @@ do
             if Dropdown.Multi then
                 local nTable = {};
 
-                for Value, Bool in next, Val do
-                    if table.find(Dropdown.Values, Value) then
-                        nTable[Value] = true
+                if type(Val) == 'table' then
+                    for Value, Bool in next, Val do
+                        if table.find(Dropdown.Values, Value) then
+                            nTable[Value] = true
+                        end;
                     end;
                 end;
 

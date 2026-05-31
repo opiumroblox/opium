@@ -253,6 +253,10 @@ local SaveManager = {} do
 
 		section:AddButton('Set as autoload', function()
 			local name = Options.SaveManager_ConfigList.Value
+			if not name or name == '' then
+				return self.Library:Notify('Select a config first', 2)
+			end
+
 			writefile(self.Folder .. '/settings/autoload.txt', name)
 			SaveManager.AutoloadLabel:SetText('Current autoload config: ' .. name)
 			self.Library:Notify(string.format('Set %q to auto load', name))
