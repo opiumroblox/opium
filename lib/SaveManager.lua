@@ -69,7 +69,9 @@ local SaveManager = {} do
 
 	function SaveManager:SetIgnoreIndexes(list)
 		for _, key in next, list do
-			self.Ignore[key] = true
+			if key ~= nil then
+				self.Ignore[key] = true
+			end
 		end
 	end
 
@@ -91,12 +93,13 @@ local SaveManager = {} do
 
 		for idx, toggle in next, Toggles do
 			if self.Ignore[idx] then continue end
+			if not toggle.Type or not self.Parser[toggle.Type] then continue end
 
 			table.insert(data.objects, self.Parser[toggle.Type].Save(idx, toggle))
 		end
 
 		for idx, option in next, Options do
-			if not self.Parser[option.Type] then continue end
+			if not option.Type or not self.Parser[option.Type] then continue end
 			if self.Ignore[idx] then continue end
 
 			table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
@@ -123,7 +126,7 @@ local SaveManager = {} do
 		if not success then return false, 'decode error' end
 
 		for _, option in next, decoded.objects do
-			if self.Parser[option.type] then
+			if type(option) == 'table' and option.type and option.idx and self.Parser[option.type] then
 				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end) -- task.spawn() so the config loading wont get stuck.
 			end
 		end

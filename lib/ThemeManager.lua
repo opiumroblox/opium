@@ -25,10 +25,12 @@ local ThemeManager = {} do
 
 		local scheme = data[2]
 		for idx, col in next, customThemeData or scheme do
-			self.Library[idx] = Color3.fromHex(col)
+			if idx ~= nil and col ~= nil then
+				self.Library[idx] = Color3.fromHex(col)
 			
-			if Options[idx] then
-				Options[idx]:SetValueRGB(Color3.fromHex(col))
+				if Options[idx] then
+					Options[idx]:SetValueRGB(Color3.fromHex(col))
+				end
 			end
 		end
 
@@ -39,7 +41,7 @@ local ThemeManager = {} do
 		-- This allows us to force apply themes without loading the themes tab :)
 		local options = { "FontColor", "MainColor", "AccentColor", "BackgroundColor", "OutlineColor" }
 		for i, field in next, options do
-			if Options and Options[field] then
+			if field ~= nil and Options and Options[field] then
 				self.Library[field] = Options[field].Value
 			end
 		end
@@ -182,7 +184,9 @@ local ThemeManager = {} do
 		local fields = { "FontColor", "MainColor", "AccentColor", "BackgroundColor", "OutlineColor" }
 
 		for _, field in next, fields do
-			theme[field] = Options[field].Value:ToHex()
+			if field ~= nil and Options[field] then
+				theme[field] = Options[field].Value:ToHex()
+			end
 		end
 
 		writefile(self.Folder .. '/themes/' .. file .. '.json', httpService:JSONEncode(theme))
